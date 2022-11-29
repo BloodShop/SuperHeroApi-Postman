@@ -2,7 +2,9 @@ global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.IdentityModel.Tokens;
 global using SuperHeroApi.DataAccess.Data;
+using AutoMapper;
 using FluentValidation;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using SuperHeroApi.DataAccess.Models;
 using SuperHeroApi.EndPoints;
@@ -66,6 +68,7 @@ builder.Services.AddCors(options => options.AddPolicy(name: "SuperHeroOrigins",
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 var app = builder.Build();
 

@@ -6,6 +6,8 @@ using SuperHeroApi.DataAccess.Data;
 using SuperHeroApi.DataAccess.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
+using SuperHeroApi.DataAccess.Models.Dto;
+using AutoMapper;
 
 namespace SuperHeroApi.EndPoints
 {
@@ -38,10 +40,10 @@ namespace SuperHeroApi.EndPoints
             return await next(context);
         }
 
-        public static async Task<IResult> List(DataContext db)
+        public static async Task<IResult> List(DataContext db, IMapper mapper)
         {
             var result = await db.SuperHeroes.ToListAsync();
-            return Results.Ok(result);
+            return Results.Ok(result.Select(hero => mapper.Map<SuperHeroDto>(hero)));
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Standard, Administrator")]
@@ -51,16 +53,17 @@ namespace SuperHeroApi.EndPoints
                 : Results.NotFound();
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Administrator")]
-        public static async Task<IResult> Create(DataContext db, IValidator<SuperHero> validator, SuperHero superHero)
+        public static async Task<IResult> Create(DataContext db, SuperHeroDto newHero, IValidator<SuperHero> validator, IMapper mapper)
         {
-            db.SuperHeroes.Add(superHero);
+            var hero = mapper.Map<SuperHero>(newHero);
+            db.SuperHeroes.Add(hero);
             await db.SaveChangesAsync();
 
-            return Results.Created($"/superheroes/{superHero.Id}", superHero);
+            return Results.Created($"/superheroes/{hero.Id}", hero);
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Administrator")]
-        public static async Task<IResult> Update(DataContext db, IValidator<SuperHero> validator, SuperHero updateSuperHero)
+        public static async Task<IResult> Update(DataContext db, SuperHero updateSuperHero, IValidator<SuperHero> validator)
         {
             var superHero = await db.SuperHeroes.FindAsync(updateSuperHero.Id);
 
