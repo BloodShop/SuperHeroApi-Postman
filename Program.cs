@@ -70,13 +70,12 @@ var app = builder.Build();
 {
     app.MapGet("/", () => "Hello dumbass!").ExcludeFromDescription();
     app.MapPost("/login",(UserLogin user, IUserService service) => Login(user, service))
-    .Accepts<UserLogin>("application/json")
-    .Produces<string>();
+        .Accepts<UserLogin>("application/json")
+        .Produces<string>();
 
     IResult Login(UserLogin user, IUserService service)
     {
-        if (!string.IsNullOrEmpty(user.Username) &&
-            !string.IsNullOrEmpty(user.Password))
+        if (!string.IsNullOrEmpty(user.Username) && !string.IsNullOrEmpty(user.Password))
         {
             var loggedInUser = service.Get(user);
             if (loggedInUser is null) return Results.NotFound("User not found");
