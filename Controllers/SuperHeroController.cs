@@ -22,6 +22,7 @@ namespace SuperHeroApi.Controllers
         }
 
         [HttpGet]
+        [Produces("superheroes/list/xml")]
         public async Task<ActionResult<List<SuperHero>>> Get() => Ok(await _ctx.SuperHeroes.ToListAsync());
 
         [HttpGet("{id}")]

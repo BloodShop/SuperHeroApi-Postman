@@ -4,6 +4,7 @@ global using Microsoft.IdentityModel.Tokens;
 global using SuperHeroApi.DataAccess.Data;
 using AutoMapper;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using SuperHeroApi.DataAccess.Models;
@@ -11,6 +12,7 @@ using SuperHeroApi.EndPoints;
 using SuperHeroApi.Services;
 using SuperHeroApi.Validators;
 using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.Serialization;
 using System.Security.Claims;
 using System.Text;
 
@@ -64,8 +66,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 builder.Services.AddCors(options => options.AddPolicy(name: "SuperHeroOrigins",
-    policy => policy.WithOrigins("http://localhost:XXXX").AllowAnyMethod().AllowAnyHeader()));
-builder.Services.AddControllers();
+    policy => policy.WithOrigins(builder.Configuration.GetSection("AllowedOrigins").Get<string[]>())
+        .WithMethods("GET", "POST", "PUT", "DELETE")
+        .WithHeaders("Authorization")));
+builder.Services.AddControllers(options =>
+{
+    options.OutputFormatters.Add(new XmlSerializerOutputFormatter());
+});
 builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);

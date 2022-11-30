@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Data;
 using SuperHeroApi.DataAccess.Models.Dto;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SuperHeroApi.EndPoints
 {
