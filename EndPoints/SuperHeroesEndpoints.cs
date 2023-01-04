@@ -1,17 +1,30 @@
-﻿using FluentValidation;
-using SuperHeroApi.Filters;
-using SuperHeroApi.Validators;
-using SuperHeroApi.Extensions;
-using SuperHeroApi.DataAccess.Data;
-using SuperHeroApi.DataAccess.Models;
+﻿using AutoMapper;
+using Carter;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
-using System.Data;
+using SuperHeroApi.DataAccess.Models;
 using SuperHeroApi.DataAccess.Models.Dto;
-using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+using System.Data;
 
 namespace SuperHeroApi.EndPoints
 {
+    /*public static class SuperHeroesEndpoints *//*: CarterModule*//*
+    {
+        *//*public SuperHeroesEndpoints() : base("/superheroes") { }*//*
+
+        public static void AddRoutes(this IEndpointRouteBuilder app)
+        {
+            app.MapGet("/superheroes/list", List).Produces<List<SuperHero>>(statusCode: 200, contentType: "application/json");
+
+            app.MapGet("/superheroes/get/{id}", Get).Produces<SuperHero>();
+            app.MapPost("/superheroes/create", Create).AddEndpointFilter(async (ctx, next) => await Validate(ctx, next))
+                .Accepts<SuperHero>("application/json")
+                .Produces<SuperHero>(statusCode: 200, contentType: "application/json");
+            app.MapPut("/superheroes/update", Update).AddEndpointFilter(async (ctx, next) => await Validate(ctx, next))
+                  .Accepts<SuperHero>("application/json")
+                  .Produces<SuperHero>(statusCode: 200, contentType: "application/json");
+            app.MapDelete("/superheroes/delete/{id}", Delete);
+        }*/
     public static class SuperHeroesEndpoints
     {
         public static void MapSuperHeroEndpoints(this WebApplication app)
@@ -41,20 +54,20 @@ namespace SuperHeroApi.EndPoints
             return await next(context);
         }
 
-        public static async Task<IResult> List(DataContext db, IMapper mapper)
+        static async Task<IResult> List(DataContext db, IMapper mapper)
         {
             var result = await db.SuperHeroes.ToListAsync();
             return Results.Ok(result.Select(hero => mapper.Map<SuperHeroDto>(hero)));
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Standard, Administrator")]
-        public static async Task<IResult> Get(DataContext db, int id) =>
+        static async Task<IResult> Get(DataContext db, int id) =>
             await db.SuperHeroes.FindAsync(id) is SuperHero superHero
                 ? Results.Ok(superHero)
                 : Results.NotFound();
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Administrator")]
-        public static async Task<IResult> Create(DataContext db, SuperHeroDto newHero, IValidator<SuperHero> validator, IMapper mapper)
+        static async Task<IResult> Create(DataContext db, SuperHeroDto newHero, IValidator<SuperHero> validator, IMapper mapper)
         {
             var hero = mapper.Map<SuperHero>(newHero);
             db.SuperHeroes.Add(hero);
@@ -64,7 +77,7 @@ namespace SuperHeroApi.EndPoints
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Administrator")]
-        public static async Task<IResult> Update(DataContext db, SuperHero updateSuperHero, IValidator<SuperHero> validator)
+        static async Task<IResult> Update(DataContext db, SuperHero updateSuperHero, IValidator<SuperHero> validator)
         {
             var superHero = await db.SuperHeroes.FindAsync(updateSuperHero.Id);
 
@@ -81,7 +94,7 @@ namespace SuperHeroApi.EndPoints
         }
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Administrator")]
-        public static async Task<IResult> Delete(DataContext db, int id)
+        static async Task<IResult> Delete(DataContext db, int id)
         {
             if (await db.SuperHeroes.FindAsync(id) is SuperHero superHero)
             {

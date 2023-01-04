@@ -2,19 +2,17 @@ global using Microsoft.AspNetCore.Authentication.JwtBearer;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.IdentityModel.Tokens;
 global using SuperHeroApi.DataAccess.Data;
-using AutoMapper;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using SuperHeroApi.DataAccess.Models;
-using SuperHeroApi.EndPoints;
 using SuperHeroApi.Services;
 using SuperHeroApi.Validators;
 using System.IdentityModel.Tokens.Jwt;
-using System.Runtime.Serialization;
 using System.Security.Claims;
 using System.Text;
+using Carter;
+using SuperHeroApi.EndPoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +23,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+//builder.Services.AddCarter();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddSwaggerGen(options =>
 {
@@ -77,11 +76,17 @@ builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
+if (app.Environment.IsDevelopment())
+{
+    // Configure the HTTP request pipeline.
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 {
     app.MapGet("/", () => "Hello dumbass!").ExcludeFromDescription();
-    app.MapPost("/login",(UserLogin user, IUserService service) => Login(user, service))
+    app.MapPost("/login", (UserLogin user, IUserService service) => Login(user, service))
         .Accepts<UserLogin>("application/json")
         .Produces<string>();
 
@@ -121,18 +126,12 @@ var app = builder.Build();
     }
 }
 
-if (app.Environment.IsDevelopment())
-{
-    // Configure the HTTP request pipeline.
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseAuthentication();
 
+//app.MapCarter();
 app.MapSuperHeroEndpoints();
-app.MapControllers();
-
+/*app.MapControllers();*/
 app.Run();
