@@ -1,43 +1,34 @@
-﻿using AutoMapper;
-using Carter;
-using FluentValidation;
-using Microsoft.AspNetCore.Authorization;
+﻿using FluentValidation;
+using SuperHeroApi.Filters;
+using SuperHeroApi.Validators;
+using SuperHeroApi.Extensions;
+using SuperHeroApi.DataAccess.Data;
 using SuperHeroApi.DataAccess.Models;
-using SuperHeroApi.DataAccess.Models.Dto;
+using Microsoft.AspNetCore.Authorization;
 using System.Data;
+using SuperHeroApi.DataAccess.Models.Dto;
+using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Carter;
 
 namespace SuperHeroApi.EndPoints
 {
-    /*public static class SuperHeroesEndpoints *//*: CarterModule*//*
+    public class SuperHeroesEndpoints : CarterModule
     {
-        *//*public SuperHeroesEndpoints() : base("/superheroes") { }*//*
+        public SuperHeroesEndpoints() : base("/superheroes") { }
 
-        public static void AddRoutes(this IEndpointRouteBuilder app)
+        public override void AddRoutes(IEndpointRouteBuilder app)
         {
-            app.MapGet("/superheroes/list", List).Produces<List<SuperHero>>(statusCode: 200, contentType: "application/json");
+            app.MapGet("/list", List).Produces<List<SuperHero>>(statusCode: 200, contentType: "application/json");
 
-            app.MapGet("/superheroes/get/{id}", Get).Produces<SuperHero>();
-            app.MapPost("/superheroes/create", Create).AddEndpointFilter(async (ctx, next) => await Validate(ctx, next))
+            app.MapGet("/get/{id}", Get).Produces<SuperHero>();
+            app.MapPost("/create", Create).AddEndpointFilter(async (ctx, next) => await Validate(ctx, next))
                 .Accepts<SuperHero>("application/json")
                 .Produces<SuperHero>(statusCode: 200, contentType: "application/json");
-            app.MapPut("/superheroes/update", Update).AddEndpointFilter(async (ctx, next) => await Validate(ctx, next))
+            app.MapPut("/update", Update).AddEndpointFilter(async (ctx, next) => await Validate(ctx, next))
                   .Accepts<SuperHero>("application/json")
                   .Produces<SuperHero>(statusCode: 200, contentType: "application/json");
-            app.MapDelete("/superheroes/delete/{id}", Delete);
-        }*/
-    public static class SuperHeroesEndpoints
-    {
-        public static void MapSuperHeroEndpoints(this WebApplication app)
-        {
-            app.MapGet("/superheroes/list", List).Produces<List<SuperHero>>(statusCode: 200, contentType: "application/json");
-            app.MapGet("/superheroes/get/{id}", Get).Produces<SuperHero>();
-            app.MapPost("/superheroes/create", Create).AddEndpointFilter(async (ctx, next) => await Validate(ctx, next))
-                .Accepts<SuperHero>("application/json")
-                .Produces<SuperHero>(statusCode: 200, contentType: "application/json");
-            app.MapPut("/superheroes/update", Update).AddEndpointFilter(async (ctx, next) => await Validate(ctx, next))
-                  .Accepts<SuperHero>("application/json")
-                  .Produces<SuperHero>(statusCode: 200, contentType: "application/json");
-            app.MapDelete("/superheroes/delete/{id}", Delete);
+            app.MapDelete("/delete/{id}", Delete);
         }
 
         static async ValueTask<object> Validate(EndpointFilterInvocationContext context, EndpointFilterDelegate next)

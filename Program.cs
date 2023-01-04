@@ -23,7 +23,7 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
-//builder.Services.AddCarter();
+builder.Services.AddCarter();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddSwaggerGen(options =>
 {
@@ -131,7 +131,8 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseAuthentication();
 
-//app.MapCarter();
-app.MapSuperHeroEndpoints();
-/*app.MapControllers();*/
+app.MapCarter();
+app.AddRoutes();
+app.MapControllers();
+
 app.Run();
