@@ -1,8 +1,11 @@
 # SuperHeroApi - Minimal api using carter
 
+## Short video of using postman request api with token authorization
+https://www.screencast.com/t/E3igDLQE , https://stackoverflow.com/a/74616217/19827098
+
 ## CarterModule implementation and passing the endpoint to the base
 
-```javascript
+```csharp
 public class SuperHeroesEndpoints : CarterModule
 {
     public SuperHeroesEndpoints() : base("/superheroes") { }
@@ -28,7 +31,7 @@ public class SuperHeroesEndpoints : CarterModule
 
 ## Declaration of validtion foreach superHero
 
-```javascript
+```csharp
 public class SuperHeroValidator : AbstractValidator<SuperHero> 
 {
     public SuperHeroValidator()
@@ -54,7 +57,7 @@ public class SuperHeroDtoValidator : AbstractValidator<SuperHeroDto>
 
 ## Filter validator for checking currect parameters passed to endpoints
 
-```javascript
+```csharp
 public class ValidationFilter<T> : IRouteHandlerFilter where T : class
 {
     readonly IValidator<T> _validator;
@@ -82,6 +85,47 @@ public class ValidationFilter<T> : IRouteHandlerFilter where T : class
 }
 ```
 
-## Short video of using postman request api with token authorization
-https://www.screencast.com/t/E3igDLQE
-https://stackoverflow.com/a/74616217/19827098
+## Global Error Handling Using Middleware
+
+> IMiddleware approach -- Program.cs
+
+> 
+```csharp
+builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>();
+
+...
+
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+```
+
+Implemented function from IMiddleware interface - Defines middleware that can be added to the application's request pipeline.
+
+```csharp
+ public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+{
+    try
+    {
+        await next(context);
+    }
+    catch (Exception e)
+    {
+        _logger.LogError(e, e.Message);
+
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+        ProblemDetails problem = new()
+        {
+            Status = (int)HttpStatusCode.InternalServerError,
+            Type = "Server error",
+            Title = "Server error",
+            Detail = "An internal server has occurred"
+        };
+
+        var json = JsonSerializer.Serialize(problem);
+
+        await context.Response.WriteAsync(json);
+
+        context.Response.ContentType = "application/json";
+    }
+}
+```
