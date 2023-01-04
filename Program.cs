@@ -76,7 +76,7 @@ builder.Services.AddControllers(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
-builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>(); /* IMiddleware approache */
+builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>(); /* IMiddleware approach */
 
 WebApplication app = builder.Build();
 
@@ -133,7 +133,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseAuthentication();
 
-app.UseMiddleware<GlobalExceptionHandlingMiddleware>(); /* IMiddleware approache */
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>(); /* IMiddleware approach */
 
 app.MapCarter();
 app.MapControllers();
