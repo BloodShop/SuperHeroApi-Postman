@@ -13,6 +13,7 @@ using System.Security.Claims;
 using System.Text;
 using Carter;
 using SuperHeroApi.EndPoints;
+using SuperHeroApi.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -75,6 +76,7 @@ builder.Services.AddControllers(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddTransient<GlobalExceptionHandlingMiddleware>(); /* IMiddleware approache */
 
 WebApplication app = builder.Build();
 
@@ -131,8 +133,9 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseAuthentication();
 
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>(); /* IMiddleware approache */
+
 app.MapCarter();
-app.AddRoutes();
 app.MapControllers();
 
 app.Run();

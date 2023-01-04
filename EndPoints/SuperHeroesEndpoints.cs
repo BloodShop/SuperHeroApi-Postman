@@ -22,7 +22,7 @@ namespace SuperHeroApi.EndPoints
             app.MapGet("/list", List).Produces<List<SuperHero>>(statusCode: 200, contentType: "application/json");
 
             app.MapGet("/get/{id}", Get).Produces<SuperHero>();
-            app.MapPost("/create", Create).AddEndpointFilter(async (ctx, next) => await Validate(ctx, next))
+            app.MapPost("/create", Create).AddEndpointFilter(async (ctx, next) => await Validate (ctx, next))
                 .Accepts<SuperHero>("application/json")
                 .Produces<SuperHero>(statusCode: 200, contentType: "application/json");
             app.MapPut("/update", Update).AddEndpointFilter(async (ctx, next) => await Validate(ctx, next))
